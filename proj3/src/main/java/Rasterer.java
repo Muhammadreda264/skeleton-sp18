@@ -9,8 +9,11 @@ import java.util.Map;
  */
 public class Rasterer {
 
+    private static final double DISTANCE_PER_PIXEL_IN_ZERO_DEBTH =0.00034332275390625;
+    private static final int FEET_PERLONGITUDE_PER_DEGREE =288200;
+
     public Rasterer() {
-        // YOUR CODE HERE
+
     }
 
     /**
@@ -42,11 +45,66 @@ public class Rasterer {
      *                    forget to set this to true on success! <br>
      */
     public Map<String, Object> getMapRaster(Map<String, Double> params) {
-        // System.out.println(params);
+
         Map<String, Object> results = new HashMap<>();
-        System.out.println("Since you haven't implemented getMapRaster, nothing is displayed in "
-                           + "your browser.");
+        System.out.println(params);
+        String[][] doit ={{"d2_x0_y1.png", "d2_x1_y1.png", "d2_x2_y1.png","d2_x3_y1.png"},
+                {"d2_x0_y2.png","d2_x1_y2.png", "d2_x2_y2.png", "d2_x3_y2.png"}};
+        results.put("render_grid",doit);
+        results.put("raster_ul_lon",-122.19737159729004);
+        results.put("raster_ul_lat",37.88);
+        results.put("w",1838.0);
+        results.put("h",981.0);
+        results.put("depth",0);
+        results.put("query_success",true);
+        results.put("raster_lr_lon",37.84676042746281);
+        results.put("raster_lr_lat",-122.27625);
+
         return results;
+    }
+
+    private int findSuitableDepth(double lowerRightlongitudinal,double upperLeftLongitude,double screenWidth){
+        double longitudinalDistance = calculatelongitudinalDistance( lowerRightlongitudinal, upperLeftLongitude);
+        double requestedLongitudinalDistancePerPixel=calculateRequestedLongitudinalDistancePerPixel
+                ( longitudinalDistance,screenWidth);
+        int suitableDepth=0;
+        double distancePerPixelInthisDebth= DISTANCE_PER_PIXEL_IN_ZERO_DEBTH;
+        while (requestedLongitudinalDistancePerPixel<distancePerPixelInthisDebth&&suitableDepth<7){
+            suitableDepth++;
+            distancePerPixelInthisDebth=distancePerPixelInthisDebth/2;
+        }
+        return suitableDepth;
+    }
+
+    private double calculatelongitudinalDistance(double lowerRightlongitudinal,double upperLeftLongitude){
+        return (lowerRightlongitudinal-upperLeftLongitude);
+    }
+
+    private double calculateRequestedLongitudinalDistancePerPixel(double longitudinaldistance,double screenWidth){
+        return longitudinaldistance/screenWidth;
+    }
+
+    private int [] calculateTheNumberOfTilesInCoordinates(int depth){
+        int [] TheNumberOfTilesInCoordinates = new int [2];
+        TheNumberOfTilesInCoordinates[0] =calculateTheNumberOfTilesInLongitudinalAxis(depth);
+        TheNumberOfTilesInCoordinates[1] =calculateTheNumberOfTilesInLatitudeAxis(depth);
+        return  TheNumberOfTilesInCoordinates;
+    }
+
+    private int calculateTheNumberOfTilesInLongitudinalAxis(int depth){
+        return (int) (MapServer.MAP_LONGITUDE_AXIS_LENGTH/calculateTheDistancePerTileINGivenDepth(depth));
+    }
+
+    private int calculateTheNumberOfTilesInLatitudeAxis(int depth){
+        return (int) (MapServer.MAP_LATITUDE_AXIS_LENGTH/calculateTheDistancePerTileINGivenDepth(depth));
+    }
+
+    private double calculateTheDistancePerTileINGivenDepth(int depth){
+        return calculateDistancePerPixel(depth)*MapServer.TILE_SIZE;
+    }
+
+    private double calculateDistancePerPixel(int depth) {
+        return DISTANCE_PER_PIXEL_IN_ZERO_DEBTH / (Math.pow(2, depth));
     }
 
 }

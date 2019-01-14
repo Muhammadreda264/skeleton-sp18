@@ -36,6 +36,11 @@ public class MapServer {
      */
     public static final double ROOT_ULLAT = 37.892195547244356, ROOT_ULLON = -122.2998046875,
             ROOT_LRLAT = 37.82280243352756, ROOT_LRLON = -122.2119140625;
+    /** The map longitude axis length */
+    public static final double MAP_LONGITUDE_AXIS_LENGTH =Math.abs(ROOT_ULLON-ROOT_LRLON) ;
+    /** The map latitude axis length */
+    public static final double MAP_LATITUDE_AXIS_LENGTH =Math.abs(ROOT_ULLAT-ROOT_LRLAT) ;
+
     /** Each tile is 256x256 pixels. */
     public static final int TILE_SIZE = 256;
     /** HTTP failed response. */
