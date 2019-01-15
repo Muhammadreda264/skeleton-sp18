@@ -47,19 +47,6 @@ public class Rasterer {
     public Map<String, Object> getMapRaster(Map<String, Double> params) {
 
         Map<String, Object> results = new HashMap<>();
-        System.out.println(params);
-        String[][] doit ={{"d2_x0_y1.png", "d2_x1_y1.png", "d2_x2_y1.png","d2_x3_y1.png"},
-                {"d2_x0_y2.png","d2_x1_y2.png", "d2_x2_y2.png", "d2_x3_y2.png"}};
-        results.put("render_grid",doit);
-        results.put("raster_ul_lon",-122.19737159729004);
-        results.put("raster_ul_lat",37.88);
-        results.put("w",1838.0);
-        results.put("h",981.0);
-        results.put("depth",0);
-        results.put("query_success",true);
-        results.put("raster_lr_lon",37.84676042746281);
-        results.put("raster_lr_lat",-122.27625);
-
         return results;
     }
 
