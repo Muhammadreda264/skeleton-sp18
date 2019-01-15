@@ -13,7 +13,7 @@ public class Rasterer {
     private static final int FEET_PERLONGITUDE_PER_DEGREE =288200;
 
     public Rasterer() {
-
+        testTheNumberOfTilesInCoordinates();
     }
 
     /**
@@ -84,27 +84,10 @@ public class Rasterer {
         return longitudinaldistance/screenWidth;
     }
 
-    private int [] calculateTheNumberOfTilesInCoordinates(int depth){
-        int [] TheNumberOfTilesInCoordinates = new int [2];
-        TheNumberOfTilesInCoordinates[0] =calculateTheNumberOfTilesInLongitudinalAxis(depth);
-        TheNumberOfTilesInCoordinates[1] =calculateTheNumberOfTilesInLatitudeAxis(depth);
-        return  TheNumberOfTilesInCoordinates;
+    private int calculateTheNumberOfTilesInAxis(int depth){
+        return (int) (Math.pow(2.0,(double)depth));
     }
 
-    private int calculateTheNumberOfTilesInLongitudinalAxis(int depth){
-        return (int) (MapServer.MAP_LONGITUDE_AXIS_LENGTH/calculateTheDistancePerTileINGivenDepth(depth));
-    }
 
-    private int calculateTheNumberOfTilesInLatitudeAxis(int depth){
-        return (int) (MapServer.MAP_LATITUDE_AXIS_LENGTH/calculateTheDistancePerTileINGivenDepth(depth));
-    }
-
-    private double calculateTheDistancePerTileINGivenDepth(int depth){
-        return calculateDistancePerPixel(depth)*MapServer.TILE_SIZE;
-    }
-
-    private double calculateDistancePerPixel(int depth) {
-        return DISTANCE_PER_PIXEL_IN_ZERO_DEBTH / (Math.pow(2, depth));
-    }
 
 }
