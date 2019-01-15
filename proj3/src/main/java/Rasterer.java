@@ -13,7 +13,7 @@ public class Rasterer {
     private static final int FEET_PERLONGITUDE_PER_DEGREE =288200;
 
     public Rasterer() {
-        testTheNumberOfTilesInCoordinates();
+
     }
 
     /**
