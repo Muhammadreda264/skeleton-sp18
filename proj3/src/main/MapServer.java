@@ -32,7 +32,7 @@ public class MapServer {
     /**
      * The root upper left/lower right longitudes and latitudes represent the bounding box of
      * the root tile, as the images in the img/ folder are scraped.
-     * Longitude == x-axis; latitude == y-axis.
+     * Longitude == x-axis; Latitude == y-axis.
      */
     public static final double ROOT_ULLAT = 37.892195547244356, ROOT_ULLON = -122.2998046875,
             ROOT_LRLAT = 37.82280243352756, ROOT_LRLON = -122.2119140625;
