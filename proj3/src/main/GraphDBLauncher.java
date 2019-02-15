@@ -12,7 +12,7 @@ public class GraphDBLauncher {
     public static void main(String[] args) {
         GraphDB g = new GraphDB(OSM_DB_PATH);
 
-        Iterable<Long> verticesIterable = g.vertices();
+        Iterable<Long> verticesIterable = g.verticesIDs();
 
         /* Convert iterable to a list. */
         List<Long> vertices = new ArrayList<Long>();
@@ -32,7 +32,9 @@ public class GraphDBLauncher {
         long v = g.closest(-122.258207, 37.875352);
         System.out.print("The vertex number closest to -122.258207, 37.875352 is " + v + ", which");
         System.out.println(" has longitude, latitude of: " + g.lon(v) + ", " + g.lat(v));
+        System.out.println(GraphDB.distance(-122.2890687,37.888468,-122.2892,37.8885));
+        System.out.println(GraphDB.distance(-122.2892,37.8885,-122.2247517,37.8264822));
 
-        System.out.println("To get started, uncomment print statements in GraphBuildingHandler.");
+        System.out.println("37.8264822To get started, uncomment print statements in GraphBuildingHandler.");
     }
 }

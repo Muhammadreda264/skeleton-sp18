@@ -8,7 +8,7 @@ public class DistancePerTileCalculator {
         return MapServer.MAP_LONGITUDE_AXIS_LENGTH/calculateTheTotalNumberOfTilesInAxis(depth);
     }
 
-    private static int calculateTheTotalNumberOfTilesInAxis(int depth){
+    public static int calculateTheTotalNumberOfTilesInAxis(int depth){
         return (int)(Math.pow(2.0,depth));
     }
 }

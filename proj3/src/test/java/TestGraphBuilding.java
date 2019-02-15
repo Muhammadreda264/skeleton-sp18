@@ -44,7 +44,7 @@ public class TestGraphBuilding {
      */
     @Test
     public void testNodeCountFullGraph() {
-        Iterable<Long> ids = graph.vertices();
+        Iterable<Long> ids = graph.verticesIDs();
         int numberOfNodes = countIterableItems(ids);
         assertEquals("Your graph should have 25176 nodes after cleaning. Consider removing the call"
                 + " to clean and seeing if you get 399287 nodes as expected as a sanity check on"
@@ -56,7 +56,7 @@ public class TestGraphBuilding {
      */
     @Test
     public void testNodeCountSmall() {
-        Iterable<Long> ids = graphSmall.vertices();
+        Iterable<Long> ids = graphSmall.verticesIDs();
         int numberOfNodes = countIterableItems(ids);
         assertEquals("Your graph should have 21 nodes after cleaning. Consider removing the call"
                 + " to clean and seeing if you get 250 nodes as expected as a sanity check on"

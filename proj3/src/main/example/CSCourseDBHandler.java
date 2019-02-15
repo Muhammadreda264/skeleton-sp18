@@ -60,7 +60,7 @@ public class CSCourseDBHandler extends DefaultHandler {
     }
 
     /**
-     * Receive notification of the end of an element. You may want to take specific terminating
+     * Receive notification of the end of Nodean element. You may want to take specific terminating
      * actions here, like finalizing vertices or edges found.
      *
      * @param uri The Namespace URI, or the empty string if the element has no Namespace URI or if

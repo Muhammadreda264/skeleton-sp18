@@ -50,25 +50,14 @@ public class Rasterer {
      *                    forget to set this to true on success! <br>
      */
     public Map<String, Object> getMapRaster(Map<String, Double> params) {
+
         Map<String, Object> results = new HashMap<>();
         Point upperLeft = new Point(params.get("ullon"),params.get("ullat"));
         Point lowerRight = new Point(params.get("lrlon"),params.get("lrlat"));
         double width =params.get("w");
-
-        System.out.println(params.get("ullon"));
-        System.out.println(params.get("ullat"));
-        System.out.println(params.get("ullon"));
-        System.out.println(params.get("ullat"));
-        System.out.println(params.get("lrlon"));
-        System.out.println(params.get("lrlat"));
+        System.out.println(params);
         querySuccess =QuerySuccess.checker(upperLeft,lowerRight);
-        results.put("query_success",true);
-        if(!querySuccess){
-            System.out.println(params.get("ullon"));
-            System.out.println(params.get("ullat"));
-            System.out.println(params.get("lrlon"));
-            System.out.println(params.get("lrlat"));
-        }
+        results.put("query_success",querySuccess);
 
         depth=SuitableDepth.find(upperLeft.getLongitudinal(),lowerRight.getLongitudinal(),width);
         results.put("depth",depth);
@@ -87,15 +76,16 @@ public class Rasterer {
 
         int lastyvalue = LastFileName.getYValue(lowerRight.getLatitude(),depth);
         double rasterLRLat=calculateTheLatitude(lastyvalue);
+
         results.put("raster_lr_lat",rasterLRLat);
-        FileName f=new FileName(firstxvalue,firstyvalue,depth);
-        FileName L =new FileName(lastxvalue,lastyvalue,depth);
+        FileName f=new FileName(depth,firstxvalue,firstyvalue);
+        FileName L =new FileName(depth,lastxvalue,lastyvalue);
+        System.out.println(f);
+        System.out.println(L);
         String[][] grid =new GridRender(f,L).Format();
         System.out.println(Arrays.deepToString(grid));
-        System.out.println(rasterULLon);
-
         results.put("render_grid",grid);
-
+        System.out.println(results);
         return results;
     }
 

@@ -17,10 +17,10 @@ $(function() {
     const themeableElements = ['body', '.actions', '.card', '.search', '.ui-autocomplete',
                                 '.status', '.settings', '.clear', '.action-icon'];
     var params = {
-        ullat: 37.88,
-        ullon: -122.27625,
-        lrlat: 37.83,
-        lrlon: -122.22,
+        ullat: 37.892195547244356,
+        ullon: -122.2998046875,
+        lrlat: 37.82280243352756,
+        lrlon: -122.2119140625,
         w: $body.width(),
         h: $body.height()
     };

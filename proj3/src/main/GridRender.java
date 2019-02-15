@@ -20,8 +20,12 @@ public class GridRender {
         int count =0;
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
+                if(count<tiles.size()){
                 grid[r][c] = tiles.get(count);
-                count++;
+                count++;}
+                else
+                break;
+
             }
         }
         return grid;
@@ -29,10 +33,15 @@ public class GridRender {
 
     private ArrayList<String> getTiles (){
         ArrayList<String> Tiles = new ArrayList<>();
+        FileName fileName=new FileName();
         int depth=lowerRight.getDepth();
         for (int j=upperLeft.getYValue();j<lowerRight.getYValue();j++){
             for (int i =upperLeft.getXValue();i<lowerRight.getXValue();i++){
-                 Tiles.add(FileName.format(i,j,depth));
+                fileName.setValues(depth,i,j);
+
+                 Tiles.add(fileName.toString());
+                 if(!fileName.isValid())
+                     System.out.println(fileName.toString());
             }
 
         }

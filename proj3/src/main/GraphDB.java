@@ -6,7 +6,11 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Graph for storing all of the intersection (vertex) and road (edge) information.
@@ -18,20 +22,14 @@ import java.util.ArrayList;
  * @author Alan Yao, Josh Hug
  */
 public class GraphDB {
-    /** Your instance variables for storing the graph. You should consider
-     * creating helper classes, e.g. Node, Edge, etc. */
+    private HashMap <Long,LinkedList<Long>> graph=new HashMap<Long,LinkedList<Long>>();
+    private HashMap<Long ,Vertex> vertices=new HashMap<Long ,Vertex>();
 
-    /**
-     * Example constructor shows how to create and start an XML parser.
-     * You do not need to modify this constructor, but you're welcome to do so.
-     * @param dbPath Path to the XML file to be parsed.
-     */
+
     public GraphDB(String dbPath) {
         try {
             File inputFile = new File(dbPath);
             FileInputStream inputStream = new FileInputStream(inputFile);
-            // GZIPInputStream stream = new GZIPInputStream(inputStream);
-
             SAXParserFactory factory = SAXParserFactory.newInstance();
             SAXParser saxParser = factory.newSAXParser();
             GraphBuildingHandler gbh = new GraphBuildingHandler(this);
@@ -39,6 +37,7 @@ public class GraphDB {
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
         }
+        System.out.println(graph.keySet().size());
         clean();
     }
 
@@ -48,6 +47,7 @@ public class GraphDB {
      * @return Cleaned string.
      */
     static String cleanString(String s) {
+
         return s.replaceAll("[^a-zA-Z ]", "").toLowerCase();
     }
 
@@ -56,17 +56,30 @@ public class GraphDB {
      *  While this does not guarantee that any two nodes in the remaining graph are connected,
      *  we can reasonably assume this since typically roads are connected.
      */
-    private void clean() {
-        // TODO: Your code here.
+    public  void clean() {
+        int h = 0;
+        HashMap<Long,LinkedList<Long>>copyGraph=graph;
+        Long []i=graph.keySet().toArray(new Long[graph.keySet().size()]);
+        System.out.println(i.length);
+        for (Long current:i){
+            if(graph.get(current).size()==0){
+                graph.remove(current);
+                h++;
+            }
+        }
+        i=graph.keySet().toArray(new Long[graph.keySet().size()]);
+        System.out.println(i.length);
+
     }
+
 
     /**
      * Returns an iterable of all vertex IDs in the graph.
      * @return An iterable of id's of all vertices in the graph.
      */
-    Iterable<Long> vertices() {
-        //YOUR CODE HERE, this currently returns only an empty list.
-        return new ArrayList<Long>();
+    public Iterable<Long> verticesIDs() {
+
+        return graph.keySet();
     }
 
     /**
@@ -74,8 +87,9 @@ public class GraphDB {
      * @param v The id of the vertex we are looking adjacent to.
      * @return An iterable of the ids of the neighbors of v.
      */
-    Iterable<Long> adjacent(long v) {
-        return null;
+    public Iterable<Long> adjacent(long v) {
+
+        return graph.get(v);
     }
 
     /**
@@ -135,8 +149,21 @@ public class GraphDB {
      * @param lat The target latitude.
      * @return The id of the node in the graph closest to the target.
      */
-    long closest(double lon, double lat) {
-        return 0;
+    public long closest(double lon, double lat) {
+        Iterator<Vertex> verticesIterator=vertices.values().iterator();
+        double closestDistance=Double.MAX_VALUE;
+        Vertex closestVertex=new Vertex();
+        Vertex currentVertex=new Vertex();
+        double currentDistance;
+        while(verticesIterator.hasNext()){
+            currentVertex=verticesIterator.next();
+            currentDistance=distance(lon,lat,currentVertex.getLon(),currentVertex.getLat());
+            if(currentDistance<closestDistance){
+                closestDistance=currentDistance;
+                closestVertex=currentVertex;
+            }
+        }
+        return closestVertex.getId();
     }
 
     /**
@@ -145,7 +172,8 @@ public class GraphDB {
      * @return The longitude of the vertex.
      */
     double lon(long v) {
-        return 0;
+
+        return (vertices.get(v).getLon());
     }
 
     /**
@@ -154,6 +182,19 @@ public class GraphDB {
      * @return The latitude of the vertex.
      */
     double lat(long v) {
-        return 0;
+
+        return (vertices.get(v).getLat());
+    }
+
+    void addVertex(Long id,Vertex v){
+        LinkedList<Long>i = new LinkedList<>();
+        graph.put(id,i);
+        vertices.put(id,v);
+    }
+
+     void addEdge(long source,long target){
+        LinkedList<Long> adj=graph.get(source);
+        adj.add(target);
+        graph.put(source,adj);
     }
 }
