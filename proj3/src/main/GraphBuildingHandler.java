@@ -41,7 +41,6 @@ public class GraphBuildingHandler extends DefaultHandler {
     private double lon;
     private double lat;
     Vertex v;
-    HashMap <String,String>extraInfo=new HashMap<>();
     boolean validWay=false;
     LinkedList<Long>nodes=new LinkedList<>();
 
@@ -77,25 +76,20 @@ public class GraphBuildingHandler extends DefaultHandler {
             lon=Double.parseDouble(attributes.getValue("lon"));
             lat =Double.parseDouble(attributes.getValue("lat"));
             v =new Vertex(id,lon,lat);
-            g.addVertex(id,v);
+            g.addVertex(v);
 
 
         } else if (qName.equals("way")) {
             /* We encountered a new <way...> tag. */
             activeState = "way";
-            //System.out.println("Beginning a way...");
+            validWay=false;
         } else if (activeState.equals("way") && qName.equals("nd")) {
             nodes.add(Long.parseLong(attributes.getValue("ref")));
-            //System.out.println("Id of a node in this way: " + attributes.getValue("ref"));
-
         } else if (activeState.equals("way") && qName.equals("tag")) {
             /* While looking at a way, we found a <tag...> tag. */
             String k = attributes.getValue("k");
             String v = attributes.getValue("v");
-            if (k.equals("maxspeed")) {
-                //System.out.println("Max Speed: " + v);
-
-            } else if (k.equals("highway")) {
+            if (k.equals("highway")) {
                 validWay=ALLOWED_HIGHWAY_TYPES.contains(attributes.getValue("v")) ;
             } else if (k.equals("name")) {
 
@@ -103,9 +97,8 @@ public class GraphBuildingHandler extends DefaultHandler {
 
         } else if (activeState.equals("node") && qName.equals("tag") && attributes.getValue("k")
                 .equals("name")) {
-           extraInfo.put(attributes.getValue("k"), attributes.getValue("v"));
-           v.setExtraInfo(extraInfo);
-           extraInfo.clear();
+            String s =attributes.getValue("v");
+
         }
     }
 
@@ -126,12 +119,10 @@ public class GraphBuildingHandler extends DefaultHandler {
             if (validWay){
                 for (int i=0;i<nodes.size()-1;i++){
                     g.addEdge(nodes.get(i),nodes.get(i+1));
-                    g.addEdge(nodes.get(i+1),nodes.get(i));
                 }
                 validWay=false;
             }
             nodes.clear();
-           // System.out.println("Finishing a way...");
         }
     }
 

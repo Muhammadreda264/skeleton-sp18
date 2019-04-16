@@ -1,58 +1,49 @@
-import java.util.HashMap;
+import java.util.HashSet;
 
 public class Vertex {
-    private long id;
-    private double lon;
-    private double lat;
-    private HashMap<String, String> extraInfo=new HashMap<>();
-
-    Vertex(){
-
-    }
+    private final long id;
+    private final double lon;
+    private final double lat;
+    private String name;
+    private HashSet<Long> adjacent;
 
 
-    Vertex(long id,double lon,double lat){
+    Vertex(long id, double lon, double lat){
         this.id=id;
         this.lon=lon;
         this.lat=lat;
-        extraInfo=new HashMap<>();
+        this.adjacent=new HashSet<>();
     }
 
     public long getId() {
-
         return id;
     }
 
-    public void setId(int id) {
-
-        this.id = id;
-    }
 
     public double getLon() {
 
         return lon;
     }
 
-    public void setLon(double lon) {
-        this.lon = lon;
-    }
 
     public double getLat() {
         return lat;
     }
 
-    public void setLat(double lat) {
-        this.lat = lat;
+
+
+    public HashSet<Long> getAdjacent() {
+        return adjacent;
     }
 
-    public HashMap<String, String> getExtraInfo() {
-        return extraInfo;
+    void addEdge(long target){
+        adjacent.add(target);
     }
 
-    public void setExtraInfo(HashMap<String, String> extraInfo) {
-        this.extraInfo = extraInfo;
+    @Override
+    public int hashCode() {
+        return (int) (id/607);
     }
-
 
 
 }

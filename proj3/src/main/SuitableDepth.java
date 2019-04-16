@@ -1,14 +1,17 @@
 public class SuitableDepth {
     private static final double DISTANCE_PER_PIXEL_IN_ZERO_DEBTH =0.00034332275390625;
-    private static double longitudinalDistance;
-    private static double screenWidth;
-    private static double lowerRightlongitudinal;
-    private static double upperLeftLongitude;
+    private  double longitudinalDistance;
+    private  double screenWidth;
+    private  double lowerRightlongitudinal;
+    private  double upperLeftLongitude;
+    public SuitableDepth(double upperLeftLongitude,double lowerRightlongitudinal,double screenWidth){
+        this.upperLeftLongitude=upperLeftLongitude;
+        this.lowerRightlongitudinal=lowerRightlongitudinal;
+        this.screenWidth=screenWidth;
 
-    public static int find(double upperLeftLongitudeVaule,double lowerRightlongitudinalVaule,double screenWidthVaule){
-        upperLeftLongitude=upperLeftLongitudeVaule;
-        lowerRightlongitudinal=lowerRightlongitudinalVaule;
-        screenWidth=screenWidthVaule;
+    }
+
+    public int find(){
         longitudinalDistance=calculateLongitudinalDistance();
         double requestedLongitudinalDistancePerPixel=calculateRequestedLongitudinalDistancePerPixel();
         int suitableDepth=0;
@@ -21,12 +24,12 @@ public class SuitableDepth {
         return suitableDepth;
     }
 
-    private static double calculateLongitudinalDistance(){
+    private double calculateLongitudinalDistance(){
 
-        return Math.abs(lowerRightlongitudinal-upperLeftLongitude);
+        return Math.abs(this.lowerRightlongitudinal-this.upperLeftLongitude);
     }
 
-    private static double calculateRequestedLongitudinalDistancePerPixel(){
+    private double calculateRequestedLongitudinalDistancePerPixel(){
 
         return longitudinalDistance/screenWidth;
     }

@@ -125,14 +125,14 @@ public class TestGraphBuilding {
         double lat = 37.8885;
         assertEquals("Make sure you're using the great circle distance, "
                 + "especially if your actual value is 1790732915",
-                53042711L, graph.closest(lon, lat));
+                53042711L, graph.closestVertexId(lon, lat));
     }
 
     @Test
     public void testClosestSmall() {
         double lon = -122.25207;
         double lat = 37.8680554;
-        assertEquals(2252623344L, graphSmall.closest(lon, lat));
+        assertEquals(2252623344L, graphSmall.closestVertexId(lon, lat));
     }
 
     static <Item> int countIterableItems(Iterable<Item> it) {

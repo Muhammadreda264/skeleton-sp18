@@ -6,11 +6,8 @@ import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
+import static java.util.stream.Collectors.*;
 
 /**
  * Graph for storing all of the intersection (vertex) and road (edge) information.
@@ -22,8 +19,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Alan Yao, Josh Hug
  */
 public class GraphDB {
-    private HashMap <Long,LinkedList<Long>> graph=new HashMap<Long,LinkedList<Long>>();
-    private HashMap<Long ,Vertex> vertices=new HashMap<Long ,Vertex>();
+
+    private HashMap<Long ,Vertex> graphDB=new HashMap<Long ,Vertex>();
 
 
     public GraphDB(String dbPath) {
@@ -37,7 +34,6 @@ public class GraphDB {
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
         }
-        System.out.println(graph.keySet().size());
         clean();
     }
 
@@ -56,20 +52,21 @@ public class GraphDB {
      *  While this does not guarantee that any two nodes in the remaining graph are connected,
      *  we can reasonably assume this since typically roads are connected.
      */
+    //fix me
     public  void clean() {
-        int h = 0;
-        HashMap<Long,LinkedList<Long>>copyGraph=graph;
-        Long []i=graph.keySet().toArray(new Long[graph.keySet().size()]);
-        System.out.println(i.length);
+        Long []i=graphDB.keySet().toArray(new Long[graphDB.keySet().size()]);
         for (Long current:i){
-            if(graph.get(current).size()==0){
-                graph.remove(current);
-                h++;
+            if(graphDB.get(current).getAdjacent().isEmpty()){
+                graphDB.remove(current);
+
             }
         }
-        i=graph.keySet().toArray(new Long[graph.keySet().size()]);
-        System.out.println(i.length);
 
+    }
+
+    public List<Vertex> vertices() {
+        List<Vertex> vertices=graphDB.values().stream().collect(toList());
+        return Collections.unmodifiableList(vertices);
     }
 
 
@@ -79,7 +76,7 @@ public class GraphDB {
      */
     public Iterable<Long> verticesIDs() {
 
-        return graph.keySet();
+        return graphDB.keySet();
     }
 
     /**
@@ -89,7 +86,7 @@ public class GraphDB {
      */
     public Iterable<Long> adjacent(long v) {
 
-        return graph.get(v);
+        return graphDB.get(v).getAdjacent();
     }
 
     /**
@@ -144,26 +141,49 @@ public class GraphDB {
     }
 
     /**
-     * Returns the vertex closest to the given longitude and latitude.
+     * Returns the vertex id closest to the given longitude and latitude.
      * @param lon The target longitude.
      * @param lat The target latitude.
      * @return The id of the node in the graph closest to the target.
      */
-    public long closest(double lon, double lat) {
-        Iterator<Vertex> verticesIterator=vertices.values().iterator();
+    public long closestVertexId(double lon, double lat) {
+        Iterator<Long> verticesIterator=verticesIDs().iterator();
         double closestDistance=Double.MAX_VALUE;
-        Vertex closestVertex=new Vertex();
-        Vertex currentVertex=new Vertex();
+        Long closest=0L;
+        Long current=0L;
         double currentDistance;
         while(verticesIterator.hasNext()){
-            currentVertex=verticesIterator.next();
-            currentDistance=distance(lon,lat,currentVertex.getLon(),currentVertex.getLat());
+            current=verticesIterator.next();
+            currentDistance=distance(lon,lat,lon(current),lat(current));
             if(currentDistance<closestDistance){
                 closestDistance=currentDistance;
-                closestVertex=currentVertex;
+                closest=current;
             }
         }
-        return closestVertex.getId();
+        return closest;
+    }
+
+    /**
+     * Returns the vertex object closest to the given longitude and latitude.
+     * @param lon The target longitude.
+     * @param lat The target latitude.
+     * @return The id of the node in the graph closest to the target.
+     */
+    public Vertex closestVertex(double lon, double lat) {
+        Iterator<Long> verticesIterator=verticesIDs().iterator();
+        double closestDistance=Double.MAX_VALUE;
+        Long closest=0L;
+        Long current=0L;
+        double currentDistance;
+        while(verticesIterator.hasNext()){
+            current=verticesIterator.next();
+            currentDistance=distance(lon,lat,lon(current),lat(current));
+            if(currentDistance<closestDistance){
+                closestDistance=currentDistance;
+                closest=current;
+            }
+        }
+        return getVertex(closest);
     }
 
     /**
@@ -172,8 +192,7 @@ public class GraphDB {
      * @return The longitude of the vertex.
      */
     double lon(long v) {
-
-        return (vertices.get(v).getLon());
+        return (graphDB.get(v).getLon());
     }
 
     /**
@@ -183,18 +202,44 @@ public class GraphDB {
      */
     double lat(long v) {
 
-        return (vertices.get(v).getLat());
+        return (graphDB.get(v).getLat());
+    }
+    /**
+     * add Vertex to the graphDB .
+     * @param v the Vertex to add to graphDB.
+     */
+    void addVertex(Vertex v) {
+        graphDB.put(v.getId(),v);
+
+    }
+    /**
+     * add edge between two edges.
+     * @param firstId the id of first Vertex.
+     * @param secondId the id of second Vertex.
+     */
+
+    void addEdge(Long firstId,Long secondId){
+        graphDB.get(firstId).addEdge(secondId);
+        graphDB.get(secondId).addEdge(firstId);
     }
 
-    void addVertex(Long id,Vertex v){
-        LinkedList<Long>i = new LinkedList<>();
-        graph.put(id,i);
-        vertices.put(id,v);
+    /**
+     * Gets the Vertex from id.
+     * @param id The id of the vertex.
+     * @return The Vertex mapped to id.
+     */
+    Vertex getVertex(Long id){
+        return graphDB.get(id);
     }
 
-     void addEdge(long source,long target){
-        LinkedList<Long> adj=graph.get(source);
-        adj.add(target);
-        graph.put(source,adj);
+    /**
+     * Validates that graphDB contains id.
+     * @param  id The id of the vertex.
+     * @return true if vertices contains id otherwise return false.
+     */
+
+    boolean contains(Long id){
+        return graphDB.containsKey(id);
     }
+
 }

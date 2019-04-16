@@ -29,7 +29,7 @@ public class GraphDBLauncher {
             }
         }
 
-        long v = g.closest(-122.258207, 37.875352);
+        long v = g.closestVertexId(-122.258207, 37.875352);
         System.out.print("The vertex number closest to -122.258207, 37.875352 is " + v + ", which");
         System.out.println(" has longitude, latitude of: " + g.lon(v) + ", " + g.lat(v));
         System.out.println(GraphDB.distance(-122.2890687,37.888468,-122.2892,37.8885));

@@ -10,12 +10,9 @@ import java.util.*;
  * not draw the output correctly.
  */
 public class Rasterer {
+    public static int depth;
 
-    public static final double DISTANCE_PER_PIXEL_IN_ZERO_DEBTH =0.00034332275390625;
-    private static int depth;
-    private double longitudinalDistance;
-    private static boolean querySuccess;
-    private static double rasterUllon;
+
 
     public Rasterer() {
 
@@ -28,7 +25,7 @@ public class Rasterer {
      *     The grid of images must obey the following properties, where image in the
      *     grid is referred to as a "tile".
      *     <ul>
-     *         <li>The tiles co llected must cover the most longitudinal distance per pixel
+     *         <li>The tiles collected must cover the most longitudinal distance per pixel
      *         (LonDPP) possible, while still covering less than or equal to the amount of
      *         longitudinal distance per pixel in the query box for the user viewport size. </li>
      *         <li>Contains all tiles that intersect the query bounding box that fulfill the
@@ -56,47 +53,35 @@ public class Rasterer {
         Point lowerRight = new Point(params.get("lrlon"),params.get("lrlat"));
         double width =params.get("w");
         System.out.println(params);
-        querySuccess =QuerySuccess.checker(upperLeft,lowerRight);
+
+        boolean querySuccess =new QuerySuccess(upperLeft,lowerRight).checke();
         results.put("query_success",querySuccess);
 
-        depth=SuitableDepth.find(upperLeft.getLongitudinal(),lowerRight.getLongitudinal(),width);
+         depth=new SuitableDepth(upperLeft.getLongitudinal(),lowerRight.getLongitudinal(),width).find();
         results.put("depth",depth);
 
-        int firstxvalue = FirstFileName.getXValue(upperLeft.getLongitudinal(),depth);
-        double rasterULLon=calculateTheLongitudal(firstxvalue);
-        results.put("raster_ul_lon",rasterULLon);
-
-        int firstyvalue = FirstFileName.getYValue(upperLeft.getLatitude(),depth);
-        double rasterULLat=calculateTheLatitude(firstyvalue);
-        results.put("raster_ul_lat",rasterULLat);
-
-        int lastxvalue = LastFileName.getXValue(lowerRight.getLongitudinal(),depth);
-        double rasterLRLon=calculateTheLongitudal(lastxvalue);
-        results.put("raster_lr_lon",rasterLRLon);
-
-        int lastyvalue = LastFileName.getYValue(lowerRight.getLatitude(),depth);
-        double rasterLRLat=calculateTheLatitude(lastyvalue);
-
-        results.put("raster_lr_lat",rasterLRLat);
-        FileName f=new FileName(depth,firstxvalue,firstyvalue);
-        FileName L =new FileName(depth,lastxvalue,lastyvalue);
-        System.out.println(f);
-        System.out.println(L);
-        String[][] grid =new GridRender(f,L).Format();
-        System.out.println(Arrays.deepToString(grid));
-        results.put("render_grid",grid);
-        System.out.println(results);
         return results;
     }
 
-    private static double calculateTheLongitudal(double xValue){
-        return MapServer.ROOT_ULLON+(xValue*DistancePerTileCalculator.inLongitudinalAxis(depth));
+
+    public static double DistancePerTileInLatitudelAxis(int depth){
+        return MapServer.MAP_LATITUDE_AXIS_LENGTH/calculateTheTotalNumberOfTilesInAxis(depth);
     }
 
-    private static double calculateTheLatitude(double yValue){
-        return MapServer.ROOT_ULLAT-(yValue* DistancePerTileCalculator.inLatitudelAxis(depth));
+    public static double DistancePerTileInLongitudinalAxis(int depth){
+        return MapServer.MAP_LONGITUDE_AXIS_LENGTH/calculateTheTotalNumberOfTilesInAxis(depth);
     }
 
+    public static int calculateTheTotalNumberOfTilesInAxis(int depth){
+        return (int)(Math.pow(2.0,depth));
+    }
+    public double calculateTheLongitudal(double xValue,int depth){
+        return MapServer.ROOT_ULLON+(xValue*Rasterer.DistancePerTileInLongitudinalAxis(depth));
+    }
+
+    public double calculateTheLatitude(double yValue,int depth){
+        return MapServer.ROOT_ULLAT-(yValue* Rasterer.DistancePerTileInLatitudelAxis(depth));
+    }
 
 
 

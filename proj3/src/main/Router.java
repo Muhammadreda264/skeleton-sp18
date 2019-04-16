@@ -1,17 +1,19 @@
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.util.stream.Collectors.toList;
+
+
 /**
  * This class provides a shortestPath method for finding routes between two points
- * on the map. Start by using Dijkstra's, and if your code isn't fast enough for your
- * satisfaction (or the autograder), upgrade your implementation by switching it to A*.
- * Your code will probably not be fast enough to pass the autograder unless you use A*.
- * The difference between A* and Dijkstra's is only a couple of lines of code, and boils
- * down to the priority you use to order your vertices.
+ * on the map by using A* .
  */
 public class Router {
+
+    private Router(){
+        // Private constructor to avoid instantiation
+    }
 
 
 
@@ -26,12 +28,93 @@ public class Router {
      * @param destlat The latitude of the destination location.
      * @return A list of node id's in the order visited on the shortest path.
      */
-    public static List<Long> shortestPath(GraphDB g, double stlon, double stlat,
-                                          double destlon, double destlat) {
-        long sourceid=g.closest(stlon,stlat);
-        long targetid=g.closest(destlon,destlat);
+    public static List<Long> shortestPath(GraphDB g, final double stlon, final double stlat,
+                                          final double destlon, final double destlat) {
+        final Long sourceId=g.closestVertexId(stlon,stlat);
+        final Long targetId=g.closestVertexId(destlon,destlat);
+        HashSet<Long> visited =new HashSet<>();
+        HashMap<Long,VertexInfo> vi=new HashMap<>();
+        Comparator<Long> c1 =(o1, o2)-> vi.get(o1).compareTo(vi.get(o2));
+        PriorityQueue<Long> distancePriorityQueue = new PriorityQueue<>(c1);
+        vi.put(sourceId,new VertexInfo(null,0.0,g.distance(sourceId,targetId)));
+        distancePriorityQueue.add(sourceId);
 
-        return null;
+        while (!distancePriorityQueue.isEmpty()){
+            Long currentSourceId=distancePriorityQueue.remove();
+            visited.add(currentSourceId);
+
+            if(currentSourceId.equals(targetId)){
+                break;
+            }
+
+            Iterator<Long>adjacent=g.adjacent(currentSourceId).iterator();
+            while (adjacent.hasNext()){
+                Long currentTargetId=adjacent.next();
+
+                if (!visited.contains(currentTargetId)&& g.contains(currentTargetId)) {
+                    double edgeDistance = g.distance(currentSourceId,currentTargetId);
+                    double newDistance = vi.get(currentSourceId).getShortestDistance()+ edgeDistance;
+                    if (!vi.containsKey(currentTargetId) || newDistance < vi.get(currentTargetId).getShortestDistance()){
+                        double heuristic=g.distance(currentTargetId,targetId);
+                        vi.put(currentTargetId,new VertexInfo(currentSourceId,newDistance,heuristic));
+                    }
+                    distancePriorityQueue.add(currentTargetId);
+                }
+            }
+
+        }
+
+        return getResult(sourceId,targetId,vi);
+    }
+
+
+    private static List<Long>getResult(Long sourceId,Long targetId,HashMap<Long,VertexInfo> info){
+        ArrayList result = new ArrayList();
+        while (!targetId.equals(sourceId)){
+            result.add(targetId);
+            targetId=info.get(targetId).getParent();
+        }
+        result.add(targetId);
+        Collections.reverse(result);
+
+        return result;
+    }
+
+    private static class VertexInfo implements Comparable<VertexInfo>{
+        private final double shortestDistance;
+        private final double heuristic;
+        private final Long parent;
+
+        public VertexInfo(Long parent,double shortestDistance,double heuristic) {
+            this.parent=parent;
+            this.shortestDistance = shortestDistance;
+            this.heuristic=heuristic;
+        }
+
+        public double getShortestDistance() {
+            return shortestDistance;
+        }
+
+        public Long getParent() {
+            return parent;
+        }
+
+        public double getHeuristic() {
+            return heuristic;
+        }
+
+        @Override
+        public int compareTo(VertexInfo anotherVertice) {
+            Double d1 =this.getShortestDistance()+this.getHeuristic();
+            Double d2=anotherVertice.getShortestDistance()+anotherVertice.getHeuristic();
+            if (d1 > d2)
+                return 1;
+            if (d1 < d2)
+                return -1;
+            return 0;
+        }
+
+
     }
 
     /**
@@ -39,7 +122,7 @@ public class Router {
      * @param g The graph to use.
      * @param route The route to translate into directions. Each element
      *              corresponds to a node from the graph in the route.
-     * @return A list of NavigatiionDirection objects corresponding to the input
+     * @return A list of NavigationDirection objects corresponding to the input
      * route.
      */
     public static List<NavigationDirection> routeDirections(GraphDB g, List<Long> route) {
@@ -166,4 +249,5 @@ public class Router {
             return Objects.hash(direction, way, distance);
         }
     }
+
 }

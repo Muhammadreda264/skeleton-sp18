@@ -22,7 +22,7 @@ public class FileName {
         setYValue(yValue);
     }
     public void setxValue(int xValue) {
-         this.xValue=xValue;
+        this.xValue=xValue;
     }
 
     public void setYValue(int yValue) {
@@ -57,7 +57,7 @@ public class FileName {
 
     private boolean isValidValue(int Value){
         return (Value>=0)&&
-                (Value<DistancePerTileCalculator.calculateTheTotalNumberOfTilesInAxis(depth));
+                (Value<Rasterer.calculateTheTotalNumberOfTilesInAxis(depth));
     }
 
 }

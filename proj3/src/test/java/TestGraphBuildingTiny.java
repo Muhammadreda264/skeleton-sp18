@@ -78,6 +78,6 @@ public class TestGraphBuildingTiny {
         double lat = 38.51;
         assertEquals("Make sure you're using the great circle distance, "
                 + "especially if your actual value is 46",
-                55L, graphTiny.closest(lon, lat));
+                55L, graphTiny.closestVertexId(lon, lat));
     }
 }
