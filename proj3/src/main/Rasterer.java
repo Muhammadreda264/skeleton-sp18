@@ -52,14 +52,19 @@ public class Rasterer {
         Point upperLeft = new Point(params.get("ullon"),params.get("ullat"));
         Point lowerRight = new Point(params.get("lrlon"),params.get("lrlat"));
         double width =params.get("w");
-        System.out.println(params);
-
         boolean querySuccess =new QuerySuccess(upperLeft,lowerRight).checke();
         results.put("query_success",querySuccess);
-
-         depth=new SuitableDepth(upperLeft.getLongitudinal(),lowerRight.getLongitudinal(),width).find();
+        depth=new SuitableDepth(upperLeft.getLongitudinal(),lowerRight.getLongitudinal(),width).find();
         results.put("depth",depth);
-
+        Boundaries b = new Boundaries(depth,upperLeft,lowerRight);
+        FileName firstFile = b.firstfile();
+        FileName lastFile =b.lastfile();
+        results.put("raster_ul_lon",firstFile.getUpperLeftLongitudal());
+        results.put("raster_ul_lat",firstFile.getUpperLeftLatitude());
+        results.put("raster_lr_lon",lastFile.getLowerRightLongitudal());
+        results.put("raster_lr_lat" ,lastFile.getLowerRightLatitude());
+        GridRender r =new GridRender(firstFile,lastFile);
+        results.put("render_grid" ,r.Format());
         return results;
     }
 
@@ -75,13 +80,7 @@ public class Rasterer {
     public static int calculateTheTotalNumberOfTilesInAxis(int depth){
         return (int)(Math.pow(2.0,depth));
     }
-    public double calculateTheLongitudal(double xValue,int depth){
-        return MapServer.ROOT_ULLON+(xValue*Rasterer.DistancePerTileInLongitudinalAxis(depth));
-    }
 
-    public double calculateTheLatitude(double yValue,int depth){
-        return MapServer.ROOT_ULLAT-(yValue* Rasterer.DistancePerTileInLatitudelAxis(depth));
-    }
 
 
 

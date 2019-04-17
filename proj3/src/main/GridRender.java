@@ -33,11 +33,10 @@ public class GridRender {
 
     private ArrayList<String> getTiles (){
         ArrayList<String> Tiles = new ArrayList<>();
-        FileName fileName=new FileName();
         int depth=lowerRight.getDepth();
         for (int j=upperLeft.getYValue();j<lowerRight.getYValue();j++){
             for (int i =upperLeft.getXValue();i<lowerRight.getXValue();i++){
-                fileName.setValues(depth,i,j);
+                FileName fileName = new FileName(depth,i,j);
 
                  Tiles.add(fileName.toString());
                  if(!fileName.isValid())
