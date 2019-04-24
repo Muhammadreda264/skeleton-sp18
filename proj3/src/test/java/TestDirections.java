@@ -23,7 +23,7 @@ public class TestDirections {
         graph = new GraphDB(OSM_DB_PATH);
     }
 
-    @Test
+    //@Test
     public void testRouteDirections() throws Exception {
         List<List<Long>> paths = pathsFromFile();
         List<List<Router.NavigationDirection>> expectedResults = resultsFromFile();

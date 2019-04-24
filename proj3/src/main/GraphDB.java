@@ -52,23 +52,15 @@ public class GraphDB {
      *  While this does not guarantee that any two nodes in the remaining graph are connected,
      *  we can reasonably assume this since typically roads are connected.
      */
-    //fix me
+
     public  void clean() {
-        Long []i=graphDB.keySet().toArray(new Long[graphDB.keySet().size()]);
-        for (Long current:i){
-            if(graphDB.get(current).getAdjacent().isEmpty()){
-                graphDB.remove(current);
 
-            }
-        }
-
+        HashMap<Long,Vertex> cleanedGraph = new HashMap<>();
+        graphDB.values().stream()
+                .filter(Vertex::hasAdjacent)
+                .forEach(Vertex ->cleanedGraph.put(Vertex.getId(),Vertex));
+        graphDB=cleanedGraph;
     }
-
-    public List<Vertex> vertices() {
-        List<Vertex> vertices=graphDB.values().stream().collect(toList());
-        return Collections.unmodifiableList(vertices);
-    }
-
 
     /**
      * Returns an iterable of all vertex IDs in the graph.

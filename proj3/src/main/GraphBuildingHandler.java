@@ -3,7 +3,10 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Set;
 
 /**
  *  Parses OSM XML files using an XML SAX parser. Used to construct the graph of roads for
@@ -37,12 +40,8 @@ public class GraphBuildingHandler extends DefaultHandler {
                     "secondary_link", "tertiary_link"));
     private String activeState = "";
     private final GraphDB g;
-    Long id;
-    private double lon;
-    private double lat;
-    Vertex v;
-    boolean validWay=false;
-    LinkedList<Long>nodes=new LinkedList<>();
+    private LinkedList<Long>nodes;
+    private static boolean validWay;
 
     /**
      * Create a new GraphBuildingHandler.
@@ -70,21 +69,22 @@ public class GraphBuildingHandler extends DefaultHandler {
     public void startElement(String uri, String localName, String qName, Attributes attributes)
             throws SAXException {
         if (qName.equals("node")) {
-
+            /* We encountered a new <node...> tag. */
             activeState = "node";
-            id =Long.parseLong(attributes.getValue("id"));
-            lon=Double.parseDouble(attributes.getValue("lon"));
-            lat =Double.parseDouble(attributes.getValue("lat"));
-            v =new Vertex(id,lon,lat);
+            Long id =Long.parseLong(attributes.getValue("id"));
+            Double lon=Double.parseDouble(attributes.getValue("lon"));
+            Double lat =Double.parseDouble(attributes.getValue("lat"));
+            Vertex v =new Vertex(id,lon,lat);
             g.addVertex(v);
-
 
         } else if (qName.equals("way")) {
             /* We encountered a new <way...> tag. */
             activeState = "way";
-            validWay=false;
+            nodes=new LinkedList<>();
         } else if (activeState.equals("way") && qName.equals("nd")) {
+            /* While looking at a way, we found a <nd...> tag. */
             nodes.add(Long.parseLong(attributes.getValue("ref")));
+
         } else if (activeState.equals("way") && qName.equals("tag")) {
             /* While looking at a way, we found a <tag...> tag. */
             String k = attributes.getValue("k");
@@ -92,13 +92,15 @@ public class GraphBuildingHandler extends DefaultHandler {
             if (k.equals("highway")) {
                 validWay=ALLOWED_HIGHWAY_TYPES.contains(attributes.getValue("v")) ;
             } else if (k.equals("name")) {
-
             }
-
         } else if (activeState.equals("node") && qName.equals("tag") && attributes.getValue("k")
                 .equals("name")) {
-            String s =attributes.getValue("v");
-
+            /* While looking at a node, we found a <tag...> with k="name". */
+            /* TODO Create a location. */
+            /* Hint: Since we found this <tag...> INSIDE a node, we should probably remember which
+            node this tag belongs to. Remember XML is parsed top-to-bottom, so probably it's the
+            last node that you looked at (check the first if-case). */
+//            System.out.println("Node's name: " + attributes.getValue("v"));
         }
     }
 
@@ -115,14 +117,12 @@ public class GraphBuildingHandler extends DefaultHandler {
      */
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
-        if (qName.equals("way")) {
-            if (validWay){
-                for (int i=0;i<nodes.size()-1;i++){
-                    g.addEdge(nodes.get(i),nodes.get(i+1));
-                }
-                validWay=false;
+        if (qName.equals("way") &&validWay) {
+            for (int i=0;i<nodes.size()-1;i++){
+                g.addEdge(nodes.get(i),nodes.get(i+1));
             }
-            nodes.clear();
+            validWay=false;
+
         }
     }
 

@@ -4,7 +4,6 @@ public class Vertex {
     private final long id;
     private final double lon;
     private final double lat;
-    private String name;
     private HashSet<Long> adjacent;
 
 
@@ -25,11 +24,9 @@ public class Vertex {
         return lon;
     }
 
-
     public double getLat() {
         return lat;
     }
-
 
 
     public HashSet<Long> getAdjacent() {
@@ -39,11 +36,10 @@ public class Vertex {
     void addEdge(long target){
         adjacent.add(target);
     }
-
-    @Override
-    public int hashCode() {
-        return (int) (id/607);
+    public boolean hasAdjacent(){
+        return !this.adjacent.isEmpty();
     }
+
 
 
 }
